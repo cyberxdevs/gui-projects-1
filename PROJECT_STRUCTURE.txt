@@ -1,0 +1,436 @@
+STRUKTUR PROJECT - APLIKASI GUI ANALISIS POSTUR
+===============================================
+
+gui-projects-1/
+│
+├── main.py                          # Entry point aplikasi - Jalankan file ini untuk memulai
+│
+├── requirements.txt                 # List dependencies Python yang harus diinstall
+├── README.md                        # Dokumentasi utama (Bahasa Indonesia)
+├── INSTALLATION.md                  # Panduan instalasi detail
+├── CONTRIBUTING.md                  # Panduan untuk kontributor
+├── ARCHITECTURE.md                  # Dokumentasi arsitektur aplikasi
+├── PROJECT_STRUCTURE.txt            # File ini - Penjelasan struktur project
+├── .gitignore                       # File yang diabaikan Git
+│
+├── config/                          # Folder konfigurasi
+│   └── config.py                   # File konfigurasi utama (warna, paths, settings)
+│
+├── assets/                          # Folder untuk asset (logo, images)
+│   ├── logo.png                    # Logo aplikasi (akan di-generate)
+│   └── create_logo.py              # Script untuk generate logo placeholder
+│
+├── models/                          # Folder untuk menyimpan model YOLO
+│   └── README.txt                  # Instruksi untuk letakkan model .pt di sini
+│
+├── exports/                         # Folder output hasil export CSV
+│   └── README.txt                  # Info bahwa hasil CSV akan disimpan di sini
+│
+└── src/                            # Source code utama
+    │
+    ├── __init__.py                 # Package marker
+    │
+    ├── gui/                        # Modul GUI - Semua dashboard
+    │   ├── __init__.py
+    │   ├── dashboard_1.py          # Dashboard 1: Input Nama & Tinggi
+    │   ├── dashboard_2.py          # Dashboard 2: Upload Model & Images
+    │   ├── dashboard_3.py          # Dashboard 3: Visualisasi Before/After
+    │   └── dashboard_4.py          # Dashboard 4: Results & Export
+    │
+    ├── analysis/                   # Modul Analisis - Logic YOLO & Postur
+    │   ├── __init__.py
+    │   ├── yolo_analyzer.py        # Wrapper untuk YOLO inference
+    │   └── posture_analyzer.py     # Analisis postur dari keypoints
+    │
+    └── utils/                      # Modul Utilities - Helper functions
+        ├── __init__.py
+        ├── image_utils.py          # Image processing (load, resize, annotate)
+        └── export_utils.py         # Export ke CSV
+
+
+PENJELASAN STRUKTUR
+===================
+
+1. ROOT LEVEL FILES
+-------------------
+
+main.py
+    - Entry point aplikasi
+    - Berisi class PostureAnalysisApp (main controller)
+    - Mengelola navigasi antar dashboard
+    - Menyimpan state aplikasi (user data, analysis data, results)
+    - JALANKAN FILE INI untuk memulai aplikasi: python main.py
+
+requirements.txt
+    - List semua dependencies Python
+    - Install dengan: pip install -r requirements.txt
+    - Dependencies utama:
+      * opencv-python (image processing)
+      * ultralytics (YOLO)
+      * pillow (GUI images)
+      * pandas (CSV export)
+      * numpy (numerical operations)
+      * matplotlib (plotting)
+
+README.md
+    - Dokumentasi lengkap dalam Bahasa Indonesia
+    - Penjelasan fitur
+    - Cara instalasi dan penggunaan
+    - Troubleshooting
+    - Contoh output
+
+INSTALLATION.md
+    - Panduan instalasi step-by-step
+    - Setup virtual environment
+    - Troubleshooting instalasi
+    - System requirements
+
+CONTRIBUTING.md
+    - Panduan untuk developer yang ingin berkontribusi
+    - Code style guidelines
+    - Git workflow
+    - Pull request process
+
+ARCHITECTURE.md
+    - Dokumentasi arsitektur teknis
+    - Design patterns yang digunakan
+    - Data flow diagram
+    - Extension points
+
+.gitignore
+    - File yang diabaikan oleh Git
+    - Virtual environment (venv/)
+    - Python cache (__pycache__)
+    - Model files (*.pt)
+    - Export results (*.csv)
+
+
+2. CONFIG FOLDER
+----------------
+
+config/config.py
+    - Konfigurasi terpusat untuk seluruh aplikasi
+    - Settings:
+      * Window size dan colors
+      * Paths (assets, models, exports)
+      * YOLO settings (default confidence)
+      * Posture classification mapping
+      * Keypoint definitions
+      * Helper functions
+
+
+3. ASSETS FOLDER
+----------------
+
+assets/logo.png
+    - Logo aplikasi yang ditampilkan di Dashboard 1
+    - Format: PNG
+    - Size: 150x150 pixels
+
+assets/create_logo.py
+    - Script Python untuk generate logo placeholder
+    - Jalankan jika logo belum ada
+
+
+4. MODELS FOLDER
+----------------
+
+models/
+    - Tempat menyimpan model YOLO (.pt files)
+    - Model harus sudah dilatih dengan keypoint detection
+    - User dapat upload model via Dashboard 2
+    - Contoh: models/yolo_posture_v1.pt
+
+
+5. EXPORTS FOLDER
+-----------------
+
+exports/
+    - Folder output untuk file CSV hasil analisis
+    - Format nama file: {nama_user}_{timestamp}_analisis_postur.csv
+    - File di-generate dari Dashboard 4
+    - Contoh: exports/John_Doe_20240107_143520_analisis_postur.csv
+
+
+6. SRC FOLDER - SOURCE CODE
+----------------------------
+
+src/gui/ - GUI MODULES
+----------------------
+
+dashboard_1.py
+    - Dashboard pertama (input data)
+    - Form input:
+      * Nama lengkap
+      * Tinggi badan (mm)
+    - Validasi input
+    - Navigasi ke Dashboard 2
+
+dashboard_2.py
+    - Dashboard kedua (upload & konfigurasi)
+    - Features:
+      * Upload model YOLO (.pt)
+      * Upload images (single/batch)
+      * Mode selection (single/batch analysis)
+      * Confidence threshold slider
+      * System info
+      * Exit button
+    - Validasi file
+    - Start analysis → Dashboard 3
+
+dashboard_3.py
+    - Dashboard ketiga (visualisasi real-time)
+    - Features:
+      * Loading indicator
+      * Before/After image comparison
+      * Analysis info display (keypoints, detections)
+      * Threading untuk analysis
+    - Run YOLO analysis
+    - Display results
+    - Navigate to Dashboard 4
+
+dashboard_4.py
+    - Dashboard keempat (hasil & export)
+    - Features:
+      * Tabbed interface:
+        - Visualization tab
+        - Analysis table tab
+        - Summary tab
+      * Export to CSV
+      * Navigation buttons
+    - Display annotated images
+    - Show analysis table
+    - Generate summary report
+
+
+src/analysis/ - ANALYSIS MODULES
+---------------------------------
+
+yolo_analyzer.py
+    - Wrapper untuk YOLO model
+    - Class: YOLOAnalyzer
+    - Methods:
+      * load_model() - Load model .pt
+      * predict() - Run inference
+      * annotate_image() - Draw bounding boxes & keypoints
+      * _parse_results() - Parse YOLO output
+    - Handle model loading errors
+    - Support confidence threshold
+
+posture_analyzer.py
+    - Analisis postur dari keypoints
+    - Class: PostureAnalyzer
+    - Methods:
+      * analyze() - Main analysis function
+      * _analyze_keypoints() - Calculate imbalances
+      * _analyze_back_front() - Back/front view analysis
+      * _analyze_side() - Side view analysis
+      * _calculate_score() - Calculate overall score
+      * generate_report_text() - Generate text report
+      * generate_classification_summary() - Generate summary
+    - Analysis types:
+      * back_front_analysis: Shoulder, Hip, Spine
+      * side_analysis: Head Shift, Head Tilt
+    - Automation debug untuk realistic values
+
+
+src/utils/ - UTILITY MODULES
+-----------------------------
+
+image_utils.py
+    - Image processing utilities
+    - Functions:
+      * load_image() - Load image dari file
+      * resize_image_for_display() - Resize untuk GUI
+      * numpy_to_photoimage() - Convert untuk Tkinter
+      * draw_bounding_box() - Draw bounding box
+      * draw_keypoints() - Draw keypoints
+      * create_side_by_side_image() - Before/after comparison
+    - Handle image format errors
+
+export_utils.py
+    - CSV export utilities
+    - Functions:
+      * export_to_csv() - Main export function
+      * get_status() - Get status label dari nilai
+      * get_component_score() - Calculate component score
+      * get_overall_status() - Get overall status
+    - Generate CSV dengan pandas
+    - Format timestamp untuk filename
+
+
+WORKFLOW APLIKASI
+=================
+
+1. User jalankan: python main.py
+2. PostureAnalysisApp initialized
+3. Dashboard 1 ditampilkan
+   ↓
+4. User input nama & tinggi
+5. Data disimpan, navigate ke Dashboard 2
+   ↓
+6. User upload model YOLO & images
+7. User set confidence threshold
+8. User klik "Analyze Images"
+   ↓
+9. Navigate ke Dashboard 3
+10. Analysis berjalan di background thread:
+    - YOLO inference (yolo_analyzer)
+    - Posture analysis (posture_analyzer)
+    - Image annotation
+11. Display before/after comparison
+    ↓
+12. User klik "View Results"
+13. Navigate ke Dashboard 4
+14. Display results dalam tabs:
+    - Visualization
+    - Table
+    - Summary
+15. User dapat export ke CSV
+16. User dapat start new analysis atau exit
+
+
+DATA FLOW
+=========
+
+User Data (Dashboard 1 → All)
+    name: str
+    height: float (mm)
+
+Analysis Data (Dashboard 2 → Dashboard 3)
+    model_path: str
+    image_paths: list[str]
+    confidence: float
+
+Results Data (Dashboard 3 → Dashboard 4)
+    For each image:
+    - image_path
+    - yolo_results (detections, keypoints)
+    - posture_results (imbalances, score, classifications)
+    - original_img, annotated_img, combined_img
+    - report_text
+
+
+DEPENDENCIES DETAIL
+===================
+
+opencv-python (cv2)
+    - Image loading dan processing
+    - Image annotation (draw rectangles, circles, text)
+    - Image resizing dan color conversion
+
+ultralytics
+    - YOLO model loading
+    - Inference
+    - Keypoint detection
+    - Support YOLO v8+
+
+pillow (PIL)
+    - Image format conversion
+    - PhotoImage untuk Tkinter
+    - Image manipulation
+
+pandas
+    - DataFrame creation
+    - CSV export
+    - Data formatting
+
+numpy
+    - Array operations
+    - Numerical calculations
+    - Image data representation
+
+matplotlib
+    - Plotting (optional)
+    - Visualization support
+
+
+EXTENSIONS & CUSTOMIZATION
+===========================
+
+Menambah Posture Class Baru:
+    1. Update POSTURE_MAPPING di config/config.py
+    2. Update model YOLO untuk detect class baru
+    3. Test dengan images
+
+Menambah Analysis Type Baru:
+    1. Update ANALYSIS_TYPE_MAPPING di config/config.py
+    2. Implement method baru di posture_analyzer.py
+    3. Update report generation
+
+Menambah Export Format (e.g., Excel):
+    1. Tambah function di export_utils.py
+    2. Add button di dashboard_4.py
+    3. Connect button ke export function
+
+Integrasi dengan Database:
+    1. Install database library (e.g., SQLite, PostgreSQL)
+    2. Create database schema
+    3. Add save/load functions
+    4. Update dashboards untuk load historical data
+
+
+TROUBLESHOOTING REFERENCE
+==========================
+
+File not found errors:
+    → Check paths di config.py
+    → Ensure directories created (models/, exports/)
+
+Model loading errors:
+    → Verify .pt file is valid YOLO model
+    → Check ultralytics version compatibility
+    → Ensure model has keypoint detection
+
+Image loading errors:
+    → Verify image format (JPG, PNG, BMP)
+    → Check file permissions
+    → Ensure file not corrupted
+
+GUI not showing:
+    → Check tkinter installation
+    → Verify Python version (3.8+)
+    → Check display settings (for WSL/remote)
+
+Import errors:
+    → Ensure all dependencies installed
+    → Activate virtual environment
+    → Check Python path
+
+
+DEVELOPMENT TIPS
+================
+
+Running in Debug Mode:
+    - Add print statements in key functions
+    - Check terminal for error messages
+    - Use try-except blocks
+
+Testing Individual Modules:
+    - Each module can be imported and tested separately
+    - Example: from src.analysis.yolo_analyzer import YOLOAnalyzer
+
+Code Style:
+    - Follow PEP 8
+    - Use descriptive variable names
+    - Add docstrings to functions
+    - Use type hints where appropriate
+
+Git Workflow:
+    - Commit often with clear messages
+    - Use feature branches
+    - Test before committing
+    - Update documentation
+
+
+CONTACT & SUPPORT
+=================
+
+For issues or questions:
+    - Create an issue on GitHub
+    - Check INSTALLATION.md for common issues
+    - Read ARCHITECTURE.md for technical details
+
+
+© 2024 Aplikasi Analisis Postur - Powered by YOLO
+Made with ❤️ using Python & Tkinter
